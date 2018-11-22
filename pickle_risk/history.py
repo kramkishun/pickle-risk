@@ -1,28 +1,16 @@
-from flask import Flask
+from flask import Blueprint, current_app
 from flask_pymongo import PyMongo
 
-import pprint, json
+import json
 
-# To launch (in Windows Powershell/VSCode):
-# > $env:FLASK_APP="pr-server.py"
-# > $env:FLASK_ENV="development"
-# > flask run
+bp = Blueprint('history', __name__, url_prefix='/history')
 
 ERROR_NO_SUCH_SYMBOL = '{"error": "NoSuchSymbol"}'
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/pickleRisk"
-mongo = PyMongo(app)
-
-app = Flask(__name__)
-
-@app.route('/')
-def hello_world():
-    return 'Check out /history'
-
-@app.route('/history')
-@app.route('/history/<symbol>')
-def stock_history(symbol=None):
+@bp.route('/')
+@bp.route('/<symbol>')
+def symbol_history(symbol=None):
+    mongo = PyMongo(current_app)
     time_series_data = mongo.db.timeSeriesDailyAdjusted.find_one({'symbol': symbol})
     if time_series_data:
         return json.dumps(basic_time_series(time_series_data["entries"]))
