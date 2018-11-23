@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo
 import pprint, json
 
 from . import history
+from . import multihistory
 
 # To launch (in Windows Powershell/VSCode):
 # > $env:FLASK_APP="pickle_risk"
@@ -30,6 +31,7 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     app.register_blueprint(history.bp)
+    app.register_blueprint(multihistory.bp)
 
     @app.route('/')
     def welcome():
