@@ -11,7 +11,11 @@ from . import history
 # > flask run
 
 # To run all tests:
-# python -m unittest discover tests -v
+# > python -m unittest discover tests
+
+# To run coverage on tests:
+# > coverage run -m unittest discover tests
+# > coverage report
 
 def create_app(test_config=None):
     app = Flask(__name__)
