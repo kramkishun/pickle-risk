@@ -3,4 +3,5 @@ venv
 .ipyn*
 .vscode
 .coverage
+application.log
 
