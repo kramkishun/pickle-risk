@@ -53,6 +53,7 @@ class TestEndpoints(unittest.TestCase):
         indexOfDate = dates.index('2018-11-13')
         self.assertAlmostEqual(closes[indexOfDate][0], 192.22999572753906, places = 4)
         self.assertAlmostEqual(closes[indexOfDate][1], 106.94000244140625, places = 4)
+        self.assertEqual(len(closes), len(dates))
 
 if __name__ == '__main__':
     unittest.main()

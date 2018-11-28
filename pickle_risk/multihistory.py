@@ -53,4 +53,3 @@ def basic_time_series(time_series):
         basic_series[entry['date']] = entry['close']
     return basic_series
 
-# TODO: Need to squash all data onto the same time axis 
