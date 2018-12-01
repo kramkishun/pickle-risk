@@ -3,6 +3,10 @@ from flask_pymongo import PyMongo
 
 import json, pprint, logging
 
+import numpy as np
+
+from .responses.line_chart_response import LineChartResponse
+
 bp = Blueprint('multihistory', __name__, url_prefix='/multihistory')
 
 ERROR_NO_SUCH_SYMBOL = '{"error": "NoSuchSymbol"}'
@@ -34,7 +38,20 @@ def symbol_history(symbol=None):
                     dates_for_symbols.append(key_date)
                     closes_for_symbols.append(get_date_array(time_series_data, key_date))
 
-        return json.dumps([dates_for_symbols, closes_for_symbols])
+        # at this point, closes_for_symbols is in form [[date1sym1, date1sym2, ...], [date2sym1, date2sym2, ...]]
+        # want it in the form: [[date1sym1, date2sym1, ...], [date1sym2, date2sym2, ...]]
+        closes_for_symbols = np.array(closes_for_symbols).T.tolist()
+
+        # if the first symbol encountered didn't cover all the dates, then these lists will all be out of 
+        # order in the same manner. Sort them together based ond ates.
+        dates_for_symbols = np.array(dates_for_symbols)
+        indices = dates_for_symbols.argsort()
+        dates_for_symbols = dates_for_symbols[indices].tolist()
+        closes_for_symbols = [np.array(closes)[indices].tolist() for closes in closes_for_symbols]
+
+        response = LineChartResponse('Prices over Time', x_axis_labels=dates_for_symbols, 
+                                     y_axis_data=closes_for_symbols)
+        return response.json_response()
 
     except (TypeError, AttributeError):
         logging.warning('Bad symbol provided')
@@ -43,7 +60,10 @@ def symbol_history(symbol=None):
 def get_date_array(time_series_data, date):
     closes_for_all_symbols = []
     for symbol_data in time_series_data:
-        closes_for_all_symbols.append(symbol_data[date])
+        if date in symbol_data:
+            closes_for_all_symbols.append(symbol_data[date])
+        else:
+            closes_for_all_symbols.append(None)
     
     return closes_for_all_symbols
 

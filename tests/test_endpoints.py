@@ -48,12 +48,13 @@ class TestEndpoints(unittest.TestCase):
     def test_multihistory_aapl_msft(self):
         rsp = self.client.get('/multihistory/?symbols=AAPL,MSFT')
         all_data = json.loads(rsp.data)
-        dates = all_data[0]
-        closes = all_data[1]
+        dates = all_data['X Axis Labels']
+        closes = all_data['Y Axis Data']
         indexOfDate = dates.index('2018-11-13')
-        self.assertAlmostEqual(closes[indexOfDate][0], 192.22999572753906, places = 4)
-        self.assertAlmostEqual(closes[indexOfDate][1], 106.94000244140625, places = 4)
-        self.assertEqual(len(closes), len(dates))
+        self.assertAlmostEqual(closes[0][indexOfDate], 192.22999572753906, places = 4)
+        self.assertAlmostEqual(closes[1][indexOfDate], 106.94000244140625, places = 4)
+        self.assertEqual(len(closes[0]), len(dates))
+        self.assertEqual(len(closes[1]), len(dates))
 
 if __name__ == '__main__':
     unittest.main()
