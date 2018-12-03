@@ -12,13 +12,17 @@ logger = logging.getLogger(__name__)
 @bp.route('/')
 @bp.route('/<symbol>')
 def symbol_history(symbol=None):
-    mongo = PyMongo(current_app)
-    time_series_data = mongo.db.timeSeriesDailyAdjusted.find_one({'symbol': symbol})
-    logger.info('Grabbing symbol history for: {0}'.format(symbol))
-    if time_series_data:
-        return json.dumps(basic_time_series(time_series_data["entries"]))
-    else:
-        logger.warning('No such symbol detected.')
+    try:
+        mongo = PyMongo(current_app)
+        symbol = symbol.upper()
+        time_series_data = mongo.db.timeSeriesDailyAdjusted.find_one({'symbol': symbol})
+        logger.info('Grabbing symbol history for: {0}'.format(symbol))
+        if time_series_data:
+            return json.dumps(basic_time_series(time_series_data["entries"]))
+        else:
+            logger.warning('No such symbol detected.')
+            return ERROR_NO_SUCH_SYMBOL
+    except AttributeError:
         return ERROR_NO_SUCH_SYMBOL
 
 def basic_time_series(time_series):

@@ -20,7 +20,7 @@ def symbol_history(symbol=None):
     logging.info('Fetching symbol history for: {}'.format(symbols))
     try:
         mongo = PyMongo(current_app)
-        all_symbols = symbols.split(',')
+        all_symbols = symbols.upper().split(',')
         time_series_data = [basic_time_series(mongo.db.timeSeriesDailyAdjusted
             .find_one({'symbol': sym})['entries']) 
             for sym in all_symbols]
@@ -50,7 +50,7 @@ def symbol_history(symbol=None):
         closes_for_symbols = [np.array(closes)[indices].tolist() for closes in closes_for_symbols]
 
         response = LineChartResponse('Prices over Time', x_axis_labels=dates_for_symbols, 
-                                     y_axis_data=closes_for_symbols)
+                                     y_axis_data=closes_for_symbols, symbols=all_symbols)
         return response.json_response()
 
     except (TypeError, AttributeError):

@@ -5,6 +5,7 @@ import pprint, json
 
 from . import history
 from . import multihistory
+from . import returns
 
 import logging
 
@@ -46,6 +47,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(history.bp)
     app.register_blueprint(multihistory.bp)
+    app.register_blueprint(returns.bp)
 
     @app.route('/')
     def welcome():
